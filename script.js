@@ -1,6 +1,6 @@
 const STORAGE_KEY = "hmr_ui_sketch_v1";
 
-const FIXED_API_URL = "https://hmr-proxy.darwin-gacuya081.workers.dev/";
+const FIXED_API_URL = "https://hmr-beta.darwin-gacuya081.workers.dev/";
 
 const elDate = document.getElementById("date");
 const elCP1 = document.getElementById("cp1");
