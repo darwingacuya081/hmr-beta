@@ -334,33 +334,32 @@ function buildPayload() {
 }
 
 
-async function submitAll(){
+async function submitAll() {
   const url = FIXED_API_URL;
 
-  const payload = { action: "submitAll", ...buildPayload() };
-  if(!payload.date) return setStatus("Date is required.", false);
+  const payload = buildPayload();
+  if (!payload.date) return setStatus("Date is required.", false);
+  if (!payload.cpSite) return setStatus("CP Site is required.", false);
 
   setStatus("Submitting...");
-  try{
+  try {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
+
     const text = await res.text();
     let json;
-    try{ json = JSON.parse(text); } catch { json = { raw:text }; }
+    try { json = JSON.parse(text); } catch { json = { raw: text }; }
 
-    if(json.status === "ok"){
+    if (json.status === "ok") {
       setStatus(`Submitted ✅ ${json.message || ""}`.trim());
-      
-      // ✅ NEW: after submit, move After -> Before (equipment section)
       rollEquipmentAfterToBefore();
-      
     } else {
       setStatus(`Submit failed: ${json.message || text}`, false);
     }
-  } catch(e){
+  } catch (e) {
     setStatus(`Submit error: ${e.message}`, false);
   }
 }
@@ -382,18 +381,14 @@ async function refreshMasterData() {
   const url = FIXED_API_URL;
 
   try {
-    // Works whether your URL already has ? or not
     const u = new URL(url);
     u.searchParams.set("action", "masterdata");
 
     const res = await fetch(u.toString(), { method: "GET" });
-    const text = await res.text();
-
-    let json;
-    try { json = JSON.parse(text); } catch { json = null; }
+    const json = await res.json();
 
     if (!json || json.status !== "ok") {
-      setStatus("MasterData fetch failed (check Web App access).", false);
+      setStatus("MasterData fetch failed (check Worker).", false);
       return;
     }
 
@@ -404,7 +399,7 @@ async function refreshMasterData() {
     fillDatalist("dl-flagman", d.Flagman || []);
     fillDatalist("dl-equipment", d.Equipment || []);
 
-    setStatus("Autocomplete lists updated from MasterData ✅");
+    setStatus("Autocomplete lists updated ✅");
   } catch (e) {
     setStatus("MasterData fetch error: " + e.message, false);
   }
